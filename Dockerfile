@@ -1,7 +1,7 @@
 FROM php:7.2-apache-stretch
 
 ENV BOOKSTACK=BookStack \
-    BOOKSTACK_VERSION=0.27.4 \
+    BOOKSTACK_VERSION=0.27.5 \
     BOOKSTACK_HOME="/var/www/bookstack"
 
 RUN apt-get update && apt-get install -y --no-install-recommends git zlib1g-dev libfreetype6-dev libjpeg62-turbo-dev libmcrypt-dev libpng-dev wget libldap2-dev libtidy-dev libxml2-dev fontconfig ttf-freefont wkhtmltopdf tar curl \
@@ -22,15 +22,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends git zlib1g-dev 
 
 COPY php.ini /usr/local/etc/php/php.ini
 COPY bookstack.conf /etc/apache2/sites-enabled/bookstack.conf
+COPY ports.conf /etc/apache2/ports.conf
 RUN a2enmod rewrite
 
 COPY docker-entrypoint.sh /
 
 WORKDIR $BOOKSTACK_HOME
 
-EXPOSE 80
+EXPOSE 8080
 
 VOLUME ["$BOOKSTACK_HOME/public/uploads","$BOOKSTACK_HOME/storage/uploads"]
+
+RUN chown -R www-data:www-data $BOOKSTACK_HOME
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
